@@ -1,0 +1,45 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - subtle blue-grey gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#546e7a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#607d8b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="1024" height="500" fill="url(#bgGrad)"/>
+  
+  <!-- Left side: Logo icon (progressive bars + pendulum) -->
+  <g transform="translate(50, 200)">
+    <!-- Progressive bars (3 bars getting taller) -->
+    <rect x="0" y="50" width="25" height="50" rx="4" fill="white" opacity="0.7"/>
+    <rect x="35" y="35" width="25" height="65" rx="4" fill="white" opacity="0.85"/>
+    <rect x="70" y="15" width="25" height="85" rx="4" fill="white"/>
+    
+    <!-- Metronome pendulum -->
+    <line x1="135" y1="25" x2="180" y2="85" stroke="white" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="180" cy="85" r="12" fill="white"/>
+  </g>
+  
+  <!-- Center: App name -->
+  <text x="600" y="220" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="88" 
+        font-weight="700" 
+        fill="white" 
+        text-anchor="middle">
+    TempoStep
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="295" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="28" 
+        font-weight="400" 
+        fill="white" 
+        opacity="0.85" 
+        text-anchor="middle"
+        letter-spacing="3">
+    Metronome · Accents · Subdivisions · Tuner
+  </text>
+</svg>
