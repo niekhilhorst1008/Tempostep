@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempoStep Premium Logo - 1024x1024</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .container {
+            text-align: center;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .instructions {
+            color: #999;
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        #logoCanvas {
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        button.secondary {
+            background: #6b7280;
+        }
+        
+        button.secondary:hover {
+            background: #4b5563;
+        }
+        
+        .preview-small {
+            margin-top: 30px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        
+        .preview-small h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-item canvas {
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .preview-item p {
+            color: #999;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 TempoStep Premium Logo</h1>
+        <div class="instructions">
+            <p><strong>Voor App Store Connect IAP Promotional Image (1024x1024)</strong></p>
+            <p>Klik op "Download PNG" om het logo op te slaan, of rechtsklik op het canvas en kies "Save image as..."</p>
+        </div>
+        
+        <canvas id="logoCanvas" width="1024" height="1024"></canvas>
+        
+        <div class="button-group">
+            <button onclick="downloadLogo()">📥 Download PNG (1024x1024)</button>
+            <button class="secondary" onclick="toggleStyle()">🎨 Toggle Style</button>
+        </div>
+        
+        <div class="preview-small">
+            <h3>Preview in verschillende maten:</h3>
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <canvas id="preview180" width="180" height="180"></canvas>
+                    <p>App Icon (180x180)</p>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview512" width="256" height="256"></canvas>
+                    <p>Medium (512x512)</p>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview1024" width="256" height="256"></canvas>
+                    <p>Store (1024x1024)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStyle = 1;
+        
+        function drawLogo(canvas, style = 1) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const center = size / 2;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            if (style === 1) {
+                // Style 1: Premium gradient background with gold crown
+                
+                // Gradient background
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#1e40af'); // Deep blue
+                gradient.addColorStop(0.5, '#3b82f6'); // Blue
+                gradient.addColorStop(1, '#60a5fa'); // Light blue
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // Main metronome triangle (white)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                const triangleHeight = size * 0.35;
+                const triangleWidth = size * 0.15;
+                ctx.moveTo(center - triangleWidth / 2, center + triangleHeight / 2);
+                ctx.lineTo(center + triangleWidth / 2, center + triangleHeight / 2);
+                ctx.lineTo(center, center - triangleHeight / 2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Golden crown above triangle
+                const crownY = center - triangleHeight / 2 - size * 0.12;
+                const crownSize = size * 0.15;
+                
+                // Crown shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(center - crownSize * 0.7, crownY + crownSize * 0.8 + 5);
+                ctx.lineTo(center - crownSize * 0.5, crownY + 5);
+                ctx.lineTo(center - crownSize * 0.3, crownY + crownSize * 0.5 + 5);
+                ctx.lineTo(center, crownY + 5);
+                ctx.lineTo(center + crownSize * 0.3, crownY + crownSize * 0.5 + 5);
+                ctx.lineTo(center + crownSize * 0.5, crownY + 5);
+                ctx.lineTo(center + crownSize * 0.7, crownY + crownSize * 0.8 + 5);
+                ctx.lineTo(center - crownSize * 0.7, crownY + crownSize * 0.8 + 5);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Crown gradient (gold)
+                const crownGradient = ctx.createLinearGradient(
+                    center - crownSize, crownY,
+                    center + crownSize, crownY + crownSize
+                );
+                crownGradient.addColorStop(0, '#fbbf24');
+                crownGradient.addColorStop(0.5, '#fcd34d');
+                crownGradient.addColorStop(1, '#fde68a');
+                ctx.fillStyle = crownGradient;
+                
+                // Draw crown
+                ctx.beginPath();
+                ctx.moveTo(center - crownSize * 0.7, crownY + crownSize * 0.8);
+                ctx.lineTo(center - crownSize * 0.5, crownY);
+                ctx.lineTo(center - crownSize * 0.3, crownY + crownSize * 0.5);
+                ctx.lineTo(center, crownY);
+                ctx.lineTo(center + crownSize * 0.3, crownY + crownSize * 0.5);
+                ctx.lineTo(center + crownSize * 0.5, crownY);
+                ctx.lineTo(center + crownSize * 0.7, crownY + crownSize * 0.8);
+                ctx.lineTo(center - crownSize * 0.7, crownY + crownSize * 0.8);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Crown highlights
+                ctx.strokeStyle = '#fef3c7';
+                ctx.lineWidth = size * 0.003;
+                ctx.stroke();
+                
+                // Add jewels to crown
+                ctx.fillStyle = '#ef4444'; // Red jewel
+                ctx.beginPath();
+                ctx.arc(center, crownY + crownSize * 0.25, crownSize * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#10b981'; // Green jewel
+                ctx.beginPath();
+                ctx.arc(center - crownSize * 0.4, crownY + crownSize * 0.4, crownSize * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(center + crownSize * 0.4, crownY + crownSize * 0.4, crownSize * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // "PREMIUM" text at bottom
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = `bold ${size * 0.055}px -apple-system, BlinkMacSystemFont, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.letterSpacing = `${size * 0.008}px`;
+                ctx.fillText('PREMIUM', center, center + triangleHeight / 2 + size * 0.15);
+                
+            } else {
+                // Style 2: Dark premium with gold accents
+                
+                // Dark gradient background
+                const gradient = ctx.createRadialGradient(center, center, 0, center, center, size * 0.7);
+                gradient.addColorStop(0, '#1f2937');
+                gradient.addColorStop(1, '#111827');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // Gold outer glow
+                ctx.shadowColor = 'rgba(251, 191, 36, 0.3)';
+                ctx.shadowBlur = size * 0.05;
+                
+                // Gold ring
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = size * 0.015;
+                ctx.beginPath();
+                ctx.arc(center, center, size * 0.38, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
+                
+                // Main metronome triangle (gold gradient)
+                const triangleGradient = ctx.createLinearGradient(
+                    center, center - size * 0.25,
+                    center, center + size * 0.25
+                );
+                triangleGradient.addColorStop(0, '#fde68a');
+                triangleGradient.addColorStop(0.5, '#fbbf24');
+                triangleGradient.addColorStop(1, '#f59e0b');
+                ctx.fillStyle = triangleGradient;
+                
+                ctx.beginPath();
+                const triangleHeight = size * 0.38;
+                const triangleWidth = size * 0.16;
+                ctx.moveTo(center - triangleWidth / 2, center + triangleHeight / 2);
+                ctx.lineTo(center + triangleWidth / 2, center + triangleHeight / 2);
+                ctx.lineTo(center, center - triangleHeight / 2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Triangle outline
+                ctx.strokeStyle = '#fef3c7';
+                ctx.lineWidth = size * 0.004;
+                ctx.stroke();
+                
+                // Small star at top
+                drawStar(ctx, center, center - size * 0.26, size * 0.04, '#fbbf24');
+                
+                // Corner stars
+                drawStar(ctx, center - size * 0.3, center - size * 0.3, size * 0.025, '#fbbf24');
+                drawStar(ctx, center + size * 0.3, center - size * 0.3, size * 0.025, '#fbbf24');
+                drawStar(ctx, center - size * 0.3, center + size * 0.3, size * 0.025, '#fbbf24');
+                drawStar(ctx, center + size * 0.3, center + size * 0.3, size * 0.025, '#fbbf24');
+                
+                // "PREMIUM" text
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = `bold ${size * 0.05}px -apple-system, BlinkMacSystemFont, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('PREMIUM', center, center + triangleHeight / 2 + size * 0.12);
+            }
+        }
+        
+        function drawStar(ctx, x, y, radius, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const r = i % 2 === 0 ? radius : radius * 0.4;
+                const px = x + Math.cos(angle) * r;
+                const py = y + Math.sin(angle) * r;
+                if (i === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        function updateAllCanvases() {
+            const mainCanvas = document.getElementById('logoCanvas');
+            drawLogo(mainCanvas, currentStyle);
+            
+            const preview180 = document.getElementById('preview180');
+            drawLogo(preview180, currentStyle);
+            
+            const preview512 = document.getElementById('preview512');
+            drawLogo(preview512, currentStyle);
+            
+            const preview1024 = document.getElementById('preview1024');
+            drawLogo(preview1024, currentStyle);
+        }
+        
+        function toggleStyle() {
+            currentStyle = currentStyle === 1 ? 2 : 1;
+            updateAllCanvases();
+        }
+        
+        function downloadLogo() {
+            const canvas = document.getElementById('logoCanvas');
+            const link = document.createElement('a');
+            link.download = 'tempostep-premium-logo-1024x1024.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Initial draw
+        updateAllCanvases();
+    </script>
+</body>
+</html>

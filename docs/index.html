@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TempoStep - Professional Metronome & Tuner App for Musicians. Progressive tempo training for faster improvement.">
+    <title>TempoStep - Support & Help</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        section {
+            margin: 3rem 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem;
+            color: var(--text);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .feature:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .feature p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .faq-item {
+            margin-bottom: 2rem;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .faq-answer {
+            color: var(--text-muted);
+            padding-left: 1rem;
+        }
+
+        .contact-info {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .contact-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .contact-info a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🎵</div>
+            <h1>TempoStep</h1>
+            <p class="subtitle">Professional Metronome & Tuner for Musicians</p>
+            
+            <div class="download-buttons">
+                <a href="https://apps.apple.com" class="btn">
+                    📱 Download on App Store
+                </a>
+                <a href="https://play.google.com" class="btn">
+                    🤖 Get it on Google Play
+                </a>
+            </div>
+        </header>
+
+        <section id="features">
+            <h2>✨ Features</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">📈</div>
+                    <h3>Progressive Tempo</h3>
+                    <p>Automatically increase tempo during practice for faster improvement</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🎼</div>
+                    <h3>Pro Metronome</h3>
+                    <p>30-300 BPM range with customizable accent patterns</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🎸</div>
+                    <h3>Chromatic Tuner</h3>
+                    <p>Accurate pitch detection for all instruments</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Time Signatures</h3>
+                    <p>Support for 2/4, 3/4, 4/4, 5/4, 6/8, and more</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">👆</div>
+                    <h3>Tap Tempo</h3>
+                    <p>Quick BPM detection by tapping the beat</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Clean Interface</h3>
+                    <p>Minimalist design optimized for musicians</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2>❓ Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">What is progressive tempo training?</div>
+                <div class="faq-answer">
+                    Progressive tempo training automatically increases the BPM during your practice session. 
+                    Start slow, and the app gradually speeds up at intervals you set. This is the most effective 
+                    way to master difficult passages and build muscle memory.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Which instruments is TempoStep suitable for?</div>
+                <div class="faq-answer">
+                    TempoStep is perfect for all musicians: guitar, piano, drums, bass, violin, vocals, 
+                    and any other instrument. The chromatic tuner supports all instruments, and the metronome 
+                    works for any musical practice.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I use the tuner?</div>
+                <div class="faq-answer">
+                    Tap the "Tuner" tab at the bottom. Play a note on your instrument, and the app will 
+                    show you the detected pitch and whether you're sharp, flat, or in tune. Make sure to 
+                    allow microphone access when prompted.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I create custom accent patterns?</div>
+                <div class="faq-answer">
+                    Yes! With the Premium version, you can create unlimited custom accent patterns. 
+                    The free version includes standard patterns for common time signatures.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Does the app work offline?</div>
+                <div class="faq-answer">
+                    Yes! TempoStep works 100% offline. All metronome and tuner features are available 
+                    without an internet connection.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What's included in the Premium version?</div>
+                <div class="faq-answer">
+                    Premium includes: advanced metronome patterns, custom accent configurations, 
+                    extended time signatures, practice session statistics, and cloud sync across devices.
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>📧 Contact & Support</h2>
+            <div class="contact-info">
+                <p style="margin-bottom: 1rem; color: var(--text-muted);">
+                    Need help? Have a question? We're here to help!
+                </p>
+                <a href="mailto:support@tempostep.app">support@tempostep.app</a>
+                
+                <p style="margin-top: 2rem; color: var(--text-muted);">
+                    Found a bug or have a feature request?
+                </p>
+                <a href="https://github.com/niekhilhorst1008/Tempostep/issues">Report on GitHub</a>
+            </div>
+        </section>
+
+        <section id="privacy">
+            <h2>🔒 Privacy Policy</h2>
+            <div class="card">
+                <h3>Data Collection</h3>
+                <p style="color: var(--text-muted);">
+                    TempoStep respects your privacy. We do not collect, store, or share any personal data. 
+                    All app settings and practice data are stored locally on your device.
+                </p>
+
+                <h3>Microphone Access</h3>
+                <p style="color: var(--text-muted);">
+                    The tuner feature requires microphone access to detect pitch. Audio data is processed 
+                    locally on your device and is never recorded, stored, or transmitted.
+                </p>
+
+                <h3>Analytics</h3>
+                <p style="color: var(--text-muted);">
+                    We do not use any analytics or tracking services. Your practice sessions remain private.
+                </p>
+
+                <h3>Third-Party Services</h3>
+                <p style="color: var(--text-muted);">
+                    The Premium version uses secure in-app purchases through Apple App Store / Google Play Store. 
+                    Payment information is handled entirely by Apple/Google - we never see your payment details.
+                </p>
+
+                <h3>Changes to Privacy Policy</h3>
+                <p style="color: var(--text-muted);">
+                    We may update this privacy policy from time to time. Changes will be posted on this page 
+                    with an updated revision date.
+                </p>
+
+                <p style="margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                    Last updated: February 2, 2026
+                </p>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>ℹ️ About</h2>
+            <div class="card">
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    TempoStep was created by musicians, for musicians. We believe that smart practice 
+                    tools help you improve faster and enjoy the learning process more.
+                </p>
+                <p style="color: var(--text-muted);">
+                    Version 1.0 · © 2025 TempoStep · Made with ❤️ for musicians
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 TempoStep. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="#privacy" style="color: var(--primary); text-decoration: none;">Privacy Policy</a> · 
+                <a href="#contact" style="color: var(--primary); text-decoration: none;">Contact</a> · 
+                <a href="https://github.com/niekhilhorst1008/Tempostep" style="color: var(--primary); text-decoration: none;">GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

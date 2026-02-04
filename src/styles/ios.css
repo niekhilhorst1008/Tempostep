@@ -1,0 +1,192 @@
+/**
+ * iOS-specific styles and optimizations
+ * SIMPLE FIX: Extends background into safe areas WITHOUT breaking layout
+ */
+
+/* ====================================
+   SAFE AREA VARIABLES
+   ==================================== */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+}
+
+/* ====================================
+   BLUE BAR FIX - SIMPLE APPROACH
+   ==================================== */
+@supports (-webkit-touch-callout: none) {
+  /* Set background color on html to fill safe areas */
+  html {
+    background-color: var(--background);
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+  
+  /* Body takes full height - NO min-height to avoid overflow issues */
+  body {
+    height: 100vh;
+    height: -webkit-fill-available;
+    background-color: var(--background);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  /* Root fills entire body */
+  #root {
+    height: 100%;
+    background-color: var(--background);
+    overflow: hidden;
+  }
+}
+
+/* ====================================
+   BOTTOM NAVIGATION - SAFE AREA
+   ==================================== */
+.ios-bottom-nav {
+  /* Add padding for home indicator - increased for better positioning */
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  background-color: var(--card) !important;
+  position: relative;
+}
+
+/* Extend nav background into safe area below */
+.ios-bottom-nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background-color: var(--card);
+  transform: translateY(100%);
+  z-index: 50;
+}
+
+/* ====================================
+   iOS VIEWPORT HEIGHT FIX
+   ==================================== */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  .ios-full-height {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+}
+
+/* ====================================
+   iOS OPTIMIZATIONS
+   ==================================== */
+
+/* Prevent text size adjustment */
+@supports (-webkit-touch-callout: none) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Better font rendering */
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Prevent tap highlight */
+@supports (-webkit-touch-callout: none) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Better button feedback */
+@supports (-webkit-touch-callout: none) {
+  button:active,
+  [role="button"]:active {
+    opacity: 0.7;
+    transition: opacity 0.1s;
+  }
+}
+
+/* Input fixes */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevent zoom on focus */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Prevent overscroll bounce */
+@supports (-webkit-overflow-scrolling: touch) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
+/* Smooth scrolling for scrollable areas */
+@supports (-webkit-overflow-scrolling: touch) {
+  .ios-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Notch/Dynamic Island support */
+@supports (padding: max(0px)) {
+  .ios-notch-safe {
+    padding-left: max(1rem, var(--safe-area-inset-left));
+    padding-right: max(1rem, var(--safe-area-inset-right));
+  }
+}
+
+/* Modal backdrop blur */
+@supports (-webkit-touch-callout: none) {
+  .ios-backdrop {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Hide scrollbars */
+@supports (-webkit-touch-callout: none) {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Range input styling */
+@supports (-webkit-touch-callout: none) {
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+  }
+}

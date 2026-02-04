@@ -1,0 +1,13 @@
+Note: You have SVG icons that will work in most browsers.
+
+For best compatibility, convert the SVG files to PNG:
+
+1. Open icon-192.svg in a browser
+2. Right-click → "Save image as" → save as PNG
+3. Do the same for icon-512.svg
+
+Or use an online converter:
+- https://cloudconvert.com/svg-to-png
+- https://svgtopng.com/
+
+The SVG files will work fine for testing on Android Chrome!
