@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="115" fill="#2563eb"/>
+  
+  <!-- Metronome shape -->
+  <path d="M256 120 L340 420 L172 420 Z" fill="white" opacity="0.95"/>
+  
+  <!-- Pendulum arm -->
+  <line x1="256" y1="120" x2="256" y2="320" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="256" cy="320" r="16" fill="#fbbf24"/>
+  
+  <!-- Base -->
+  <rect x="156" y="420" width="200" height="12" rx="6" fill="white" opacity="0.8"/>
+  
+  <!-- Accent dots -->
+  <circle cx="220" cy="240" r="8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="256" cy="200" r="8" fill="#fbbf24"/>
+  <circle cx="292" cy="240" r="8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="328" cy="280" r="8" fill="#fbbf24" opacity="0.4"/>
+  
+  <!-- Sound wave icon in corner -->
+  <path d="M400 140 Q410 150 400 160 M415 135 Q430 150 415 165 M430 130 Q450 150 430 170" 
+        stroke="white" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+</svg>
