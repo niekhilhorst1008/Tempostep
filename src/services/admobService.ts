@@ -6,7 +6,7 @@
  * When running in Capacitor (native app), it shows real AdMob ads.
  */
 
-import { getAdUnitId, getAppId, isNativeApp } from '../config/admob';
+import { getAdUnitId, getAppId, isNativeApp, isSimulator } from '../config/admob';
 
 // Type definitions for AdMob plugin (will be available after installing the plugin)
 declare global {
@@ -36,33 +36,39 @@ class AdMobService {
    * Call this once when the app starts
    */
   async initialize(): Promise<void> {
-    if (!isNativeApp()) {
-      console.log('AdMob: Running in PWA mode, using placeholder ads');
+    // Don't initialize in web or simulator
+    if (!isNativeApp() || isSimulator()) {
+      console.log('[AdMob] Skipping initialization (web or simulator)');
       this.isInitialized = true;
       return;
     }
 
     if (this.isInitialized) {
-      console.log('AdMob: Already initialized');
       return;
     }
 
     try {
       if (!window.AdMob) {
-        console.warn('AdMob: Plugin not available. This is expected in browser/PWA mode.');
-        console.warn('AdMob: Install @capacitor-community/admob for native app functionality.');
+        console.log('[AdMob] Plugin not available');
         this.isInitialized = true; // Mark as initialized to prevent repeated warnings
         return;
       }
 
-      await window.AdMob.initialize({
+      // Add 5 second timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('AdMob initialization timeout')), 5000)
+      );
+      
+      const initPromise = window.AdMob.initialize({
         requestTrackingAuthorization: true, // For iOS 14+
       });
+      
+      await Promise.race([initPromise, timeoutPromise]);
 
+      console.log('[AdMob] Initialized successfully');
       this.isInitialized = true;
-      console.log('AdMob: Initialized successfully');
     } catch (error) {
-      console.warn('AdMob: Initialization skipped -', error);
+      console.error('[AdMob] Initialization error:', error);
       this.isInitialized = true; // Mark as initialized to prevent repeated attempts
     }
   }
@@ -71,8 +77,8 @@ class AdMobService {
    * Show banner ad at the bottom of the screen
    */
   async showBanner(): Promise<void> {
-    if (!isNativeApp()) {
-      console.log('AdMob: Banner shown (placeholder in PWA)');
+    // Don't show in web or simulator
+    if (!isNativeApp() || isSimulator()) {
       return;
     }
 
@@ -87,8 +93,7 @@ class AdMobService {
         adId: getAdUnitId('banner'),
         position: 'bottom',
       });
-
-      console.log('AdMob: Banner displayed');
+      console.log('[AdMob] Banner shown');
     } catch (error) {
       console.error('AdMob: Failed to show banner', error);
     }
@@ -99,14 +104,12 @@ class AdMobService {
    */
   async hideBanner(): Promise<void> {
     if (!isNativeApp()) {
-      console.log('AdMob: Banner hidden (placeholder in PWA)');
       return;
     }
 
     try {
       if (!window.AdMob) return;
       await window.AdMob.hideBanner();
-      console.log('AdMob: Banner hidden');
     } catch (error) {
       console.error('AdMob: Failed to hide banner', error);
     }
@@ -117,14 +120,12 @@ class AdMobService {
    */
   async removeBanner(): Promise<void> {
     if (!isNativeApp()) {
-      console.log('AdMob: Banner removed (placeholder in PWA)');
       return;
     }
 
     try {
       if (!window.AdMob) return;
       await window.AdMob.removeBanner();
-      console.log('AdMob: Banner removed');
     } catch (error) {
       console.error('AdMob: Failed to remove banner', error);
     }
@@ -136,7 +137,6 @@ class AdMobService {
    */
   async prepareInterstitial(): Promise<void> {
     if (!isNativeApp()) {
-      console.log('AdMob: Interstitial prepared (placeholder in PWA)');
       this.interstitialReady = true;
       return;
     }
@@ -153,7 +153,6 @@ class AdMobService {
       });
 
       this.interstitialReady = true;
-      console.log('AdMob: Interstitial prepared');
     } catch (error) {
       console.error('AdMob: Failed to prepare interstitial', error);
       this.interstitialReady = false;
@@ -166,14 +165,12 @@ class AdMobService {
    */
   async showInterstitial(): Promise<boolean> {
     if (!isNativeApp()) {
-      console.log('AdMob: Interstitial shown (placeholder in PWA)');
       // Simulate ad display delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       return true;
     }
 
     if (!this.interstitialReady) {
-      console.log('AdMob: Interstitial not ready, preparing...');
       await this.prepareInterstitial();
       // Wait a bit for ad to load
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -184,7 +181,6 @@ class AdMobService {
 
       await window.AdMob.showInterstitial();
       this.interstitialReady = false; // Need to prepare again for next show
-      console.log('AdMob: Interstitial shown');
       
       // Prepare next ad
       this.prepareInterstitial();
@@ -202,7 +198,6 @@ class AdMobService {
    */
   async prepareRewardedVideo(): Promise<void> {
     if (!isNativeApp()) {
-      console.log('AdMob: Rewarded video prepared (placeholder in PWA)');
       this.rewardedReady = true;
       return;
     }
@@ -219,7 +214,6 @@ class AdMobService {
       });
 
       this.rewardedReady = true;
-      console.log('AdMob: Rewarded video prepared');
     } catch (error) {
       console.error('AdMob: Failed to prepare rewarded video', error);
       this.rewardedReady = false;
@@ -232,14 +226,12 @@ class AdMobService {
    */
   async showRewardedVideo(): Promise<boolean> {
     if (!isNativeApp()) {
-      console.log('AdMob: Rewarded video shown (placeholder in PWA)');
       // Simulate watching ad
       await new Promise(resolve => setTimeout(resolve, 2000));
       return true;
     }
 
     if (!this.rewardedReady) {
-      console.log('AdMob: Rewarded video not ready, preparing...');
       await this.prepareRewardedVideo();
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
@@ -249,7 +241,6 @@ class AdMobService {
 
       await window.AdMob.showRewardVideo();
       this.rewardedReady = false;
-      console.log('AdMob: Rewarded video shown');
       
       // Prepare next ad
       this.prepareRewardedVideo();
@@ -277,5 +268,6 @@ class AdMobService {
   }
 }
 
-// Export singleton instance
+// Create and export singleton instance
 export const admobService = new AdMobService();
+export default admobService;

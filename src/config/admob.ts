@@ -12,17 +12,17 @@
 import { Capacitor } from '@capacitor/core';
 
 export const ADMOB_CONFIG = {
-  // Replace these with your actual AdMob IDs from admob.google.com
+  // ✅ Real AdMob IDs for TempoStep
   appId: {
-    android: 'ca-app-pub-3940256099942544~3347511713', // Google's test app ID - REPLACE LATER
-    ios: 'ca-app-pub-3940256099942544~3347511713',     // Google's test app ID - REPLACE LATER
+    android: 'ca-app-pub-1079002450240975~6210213643', // ✅ REAL Android App ID
+    ios: 'ca-app-pub-1079002450240975~6210213643',     // ✅ REAL iOS App ID
   },
   
   adUnitIds: {
     // Banner ads (shown at bottom of app)
     banner: {
-      android: 'ca-app-pub-3940256099942544/6300978111', // TEST ID - REPLACE with your real ID later
-      ios: 'ca-app-pub-3940256099942544/2934735716',     // TEST ID - REPLACE with your real ID later
+      android: 'ca-app-pub-1079002450240975/2599007784', // ✅ REAL Android Banner ID
+      ios: 'ca-app-pub-1079002450240975/2599007784',     // ✅ REAL iOS Native Banner ID
     },
     
     // Interstitial ads (full-screen ads shown between activities)
@@ -90,5 +90,24 @@ export function isNativeApp(): boolean {
   } catch {
     // Fallback: check if Capacitor object exists
     return !!(window as any).Capacitor;
+  }
+}
+
+/**
+ * Check if running in iOS Simulator (AdMob doesn't work in simulator)
+ */
+export function isSimulator(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    // In simulator, device info often contains 'Simulator' or has specific markers
+    const platform = Capacitor.getPlatform();
+    if (platform !== 'ios') return false;
+    
+    // Check if running in simulator via user agent or other markers
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.includes('simulator') || ua.includes('x86_64');
+  } catch {
+    return false;
   }
 }

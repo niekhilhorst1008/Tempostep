@@ -20,8 +20,8 @@ import { translate } from "./utils/translations";
 import { Preset, createPreset } from "./types/preset";
 import { SoundType, playSound } from "./types/sound";
 import { PremiumFeatures, loadPremiumFeatures, savePremiumFeatures } from "./types/premium";
-import { admobService } from "../services/admobService";
 import { iapService } from "../services/iapService";
+import { admobService } from "../services/admobService";
 import { 
   isIOS, 
   triggerHaptic, 
@@ -41,6 +41,7 @@ export default function App() {
   const [subdivision, setSubdivision] = useState(1); // 1=quarter, 2=8th, 3=triplet, 4=16th
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [appSettingsOpen, setAppSettingsOpen] = useState(false);
+  const [downbeatAccentEnabled, setDownbeatAccentEnabled] = useState(true); // Downbeat accent feature
   
   // App settings
   const [theme, setTheme] = useState<Theme>('light');
@@ -64,7 +65,9 @@ export default function App() {
   
   // Premium features
   const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatures>(loadPremiumFeatures());
-  const [premiumModalOpen, setPremiumModalOpen] = useState(false);
+  // 📸 SCREENSHOT MODE: Set to TRUE to auto-open Premium Modal for App Store screenshot
+  // ⚠️ IMPORTANT: Set back to FALSE before production build!
+  const [premiumModalOpen, setPremiumModalOpen] = useState(false); // Change to TRUE for screenshot
   
   // Sound settings
   const [soundType, setSoundType] = useState<SoundType>('beep');
@@ -106,25 +109,17 @@ export default function App() {
   
   // Test audio function
   const testAudio = async () => {
-    console.log('🧪 TEST AUDIO - Starting...');
-    
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
       audioContextRef.current = new AudioContext();
-      console.log('🧪 Created new AudioContext:', audioContextRef.current.state);
     }
     
     if (audioContextRef.current.state === 'suspended') {
       try {
         await audioContextRef.current.resume();
-        console.log('🧪 Resumed AudioContext:', audioContextRef.current.state);
       } catch (err) {
-        console.warn('🧪 Failed to resume (was probably closed), creating new one');
         audioContextRef.current = new AudioContext();
       }
     }
-    
-    console.log('🧪 AudioContext state:', audioContextRef.current.state);
-    console.log('🧪 Current time:', audioContextRef.current.currentTime);
     
     const oscillator = audioContextRef.current.createOscillator();
     const gainNode = audioContextRef.current.createGain();
@@ -138,9 +133,6 @@ export default function App() {
     const now = audioContextRef.current.currentTime;
     oscillator.start(now);
     oscillator.stop(now + 0.2);
-    
-    console.log('🧪 TEST AUDIO - Oscillator started at', now, 'will stop at', now + 0.2);
-    console.log('🧪 If you hear nothing, check your system volume or browser permissions!');
   };
   
   // Schedule a note to be played
@@ -151,26 +143,44 @@ export default function App() {
     audioContext: AudioContext,
     currentAccents: boolean[],
     currentBeatsPerBar: number,
-    currentSoundType: SoundType
+    currentSoundType: SoundType,
+    currentDownbeatEnabled: boolean
   ) => {
+    // EXTRA SAFETY: Return early if context doesn't exist or is invalid
+    if (!audioContext) {
+      console.error('❌ scheduleNote: No AudioContext!');
+      return;
+    }
+    
     // Safety check - don't try to play on a closed context
     if (audioContext.state === 'closed') {
       console.error('❌ Tried to schedule note on closed AudioContext!');
       return;
     }
     
-    const isMainBeat = subdivisionIndex === 0;
+    // iOS SAFETY: Check if destination exists
+    if (!audioContext.destination) {
+      console.error('❌ scheduleNote: No audio destination!');
+      return;
+    }
     
-    if (isMainBeat) {
-      const isAccent = currentAccents[beatNumber % currentBeatsPerBar];
+    try {
+      const isMainBeat = subdivisionIndex === 0;
       
-      // Play the selected sound type for main beats
-      playSound(audioContext, time, currentSoundType, isAccent);
-      
-      console.log(`🔊 Beat ${beatNumber}, accent: ${isAccent}, time: ${time.toFixed(3)}, sound: ${currentSoundType}, context: ${audioContext.state}`);
-    } else {
-      // Subdivision tick - use the same sound type but softer and higher pitched
-      playSubdivisionSound(audioContext, time, currentSoundType);
+      if (isMainBeat) {
+        const beatIndex = beatNumber % currentBeatsPerBar;
+        const isDownbeat = beatIndex === 0 && currentDownbeatEnabled;
+        const isAccent = currentAccents[beatIndex];
+        
+        // Play the selected sound type for main beats
+        // Downbeat takes priority over regular accent
+        playSound(audioContext, time, currentSoundType, isAccent, isDownbeat);
+      } else {
+        // Subdivision tick - use the same sound type but softer and higher pitched
+        playSubdivisionSound(audioContext, time, currentSoundType);
+      }
+    } catch (err) {
+      console.error('❌ scheduleNote crashed:', err);
     }
   }, []);
   
@@ -310,7 +320,6 @@ export default function App() {
   const scheduler = useCallback(() => {
     // ALWAYS check and recreate if needed
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
-      console.log('🔄 Creating new AudioContext in scheduler (old was closed)');
       audioContextRef.current = new AudioContext();
     }
     
@@ -318,7 +327,6 @@ export default function App() {
     
     // Handle suspended state
     if (audioContext.state === 'suspended') {
-      console.warn('⚠️ AudioContext suspended, attempting resume...');
       // Don't await - just trigger resume and continue
       audioContext.resume().catch(err => {
         console.error('❌ Resume failed:', err);
@@ -339,8 +347,6 @@ export default function App() {
     const secondsPerBeat = 60.0 / actualTempo;
     const secondsPerSubdivision = secondsPerBeat / subdivision;
     
-    console.log('⏱️ Scheduler tick - next:', nextNoteTimeRef.current.toFixed(3), 'current:', audioContext.currentTime.toFixed(3), 'diff:', (nextNoteTimeRef.current - audioContext.currentTime).toFixed(3));
-    
     while (
       nextNoteTimeRef.current <
       audioContext.currentTime + scheduleAheadTime
@@ -351,7 +357,7 @@ export default function App() {
       const subdivisionIndex = totalSubdivisions % subdivision;
       
       // Schedule the note
-      scheduleNote(nextNoteTimeRef.current, beatNumber, subdivisionIndex, audioContext, accents, beatsPerBar, soundType);
+      scheduleNote(nextNoteTimeRef.current, beatNumber, subdivisionIndex, audioContext, accents, beatsPerBar, soundType, downbeatAccentEnabled);
       
       // Update UI for main beats
       if (subdivisionIndex === 0) {
@@ -370,7 +376,7 @@ export default function App() {
     
     // Use shorter interval for more responsive scheduling
     schedulerTimerRef.current = window.setTimeout(scheduler, 25);
-  }, [actualTempo, subdivision, beatsPerBar, soundType, scheduleNote, accents]);
+  }, [actualTempo, subdivision, beatsPerBar, soundType, scheduleNote, accents, downbeatAccentEnabled]);
   
   // Start/stop metronome
   const togglePlay = async () => {
@@ -381,16 +387,13 @@ export default function App() {
       // Initialize audio context
       if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
         audioContextRef.current = new AudioContext();
-        console.log('✅ Audio context created:', audioContextRef.current.state);
       }
       
       // Resume audio context if suspended (required by some browsers)
       if (audioContextRef.current.state === 'suspended') {
         try {
           await audioContextRef.current.resume();
-          console.log('✅ Audio context resumed:', audioContextRef.current.state);
         } catch (err) {
-          console.warn('⚠️ Failed to resume (was probably closed), creating new one');
           audioContextRef.current = new AudioContext();
         }
       }
@@ -400,17 +403,12 @@ export default function App() {
         await initAudioContextIOS(audioContextRef.current);
       }
       
-      // Verify audio context is running
-      console.log('Audio context state before starting:', audioContextRef.current.state);
-      console.log('Sound type:', soundType);
-      
       // Request wake lock to keep app active in background
       if ('wakeLock' in navigator) {
         try {
           wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
-          console.log('Wake Lock acquired');
         } catch (err) {
-          console.log('Wake Lock not available:', err);
+          // Wake lock not available
         }
       }
       
@@ -422,12 +420,6 @@ export default function App() {
       nextNoteTimeRef.current = audioContextRef.current.currentTime + 0.1; // Small delay to ensure everything is ready
       
       setIsPlaying(true);
-      
-      console.log('🎵 Starting metronome - AudioContext:', audioContextRef.current.state);
-      console.log('🎵 Current time:', audioContextRef.current.currentTime);
-      console.log('🎵 Next note time:', nextNoteTimeRef.current);
-      console.log('🎵 Sound type:', soundType);
-      console.log('🎵 Tempo:', actualTempo, 'BPM');
       
       // Start scheduler immediately
       scheduler();
@@ -465,7 +457,6 @@ export default function App() {
       if (wakeLockRef.current) {
         wakeLockRef.current.release();
         wakeLockRef.current = null;
-        console.log('Wake Lock released');
       }
       
       setIsPlaying(false);
@@ -506,14 +497,13 @@ export default function App() {
   
   // Initialize AdMob and IAP on app start
   useEffect(() => {
-    // Initialize AdMob and prepare first interstitial ad
+    // Initialize AdMob
     admobService.initialize()
       .then(() => {
-        // Pre-load interstitial ad for later use
-        admobService.prepareInterstitial();
+        console.log('[App] AdMob initialized successfully');
       })
       .catch((error) => {
-        console.warn('AdMob initialization skipped:', error);
+        console.log('[App] AdMob initialization skipped (web or error):', error);
       });
     
     // Initialize In-App Purchases (RevenueCat)
@@ -529,30 +519,49 @@ export default function App() {
           };
           setPremiumFeatures(newFeatures);
           savePremiumFeatures(newFeatures);
+          setIsPremium(true);
+          
+          // Hide any ads if user is premium
+          await admobService.removeBanner();
         }
       })
       .catch((error) => {
-        console.warn('IAP initialization skipped:', error);
+        console.log('[App] IAP initialization skipped:', error);
       });
   }, []);
   
   // iOS-specific initialization
   useEffect(() => {
     if (isIOS()) {
-      console.log('iOS device detected - applying optimizations');
-      
       // Fix viewport height for iOS
       fixIOSViewportHeight();
       
       // Request persistent storage
-      requestPersistentStorage().then((granted) => {
-        console.log('Persistent storage granted:', granted);
-      });
-      
-      // Log iOS version for debugging
-      console.log('Running on iOS');
+      requestPersistentStorage();
     }
   }, []);
+  
+  // Show/hide ads based on premium status and active tab
+  useEffect(() => {
+    const shouldShowAds = !premiumFeatures.adFree && activeTab === 'metronome';
+    
+    if (shouldShowAds) {
+      // Show banner ad for free users on metronome tab
+      admobService.showBanner().catch((error) => {
+        console.log('[App] Failed to show ad:', error);
+      });
+    } else {
+      // Hide banner ad on other tabs or for premium users
+      admobService.hideBanner().catch((error) => {
+        console.log('[App] Failed to hide ad:', error);
+      });
+    }
+    
+    // Cleanup: hide ads when component unmounts
+    return () => {
+      admobService.hideBanner().catch(() => {});
+    };
+  }, [premiumFeatures.adFree, activeTab]);
   
   // Load settings from localStorage
   useEffect(() => {
@@ -560,10 +569,14 @@ export default function App() {
     const savedLanguage = localStorage.getItem('language') as Language | null;
     const savedIsPremium = localStorage.getItem('isPremium') === 'true';
     const savedPresets = localStorage.getItem('presets');
+    const savedDownbeatAccent = localStorage.getItem('downbeatAccentEnabled');
     
     if (savedTheme) setTheme(savedTheme);
     if (savedLanguage) setLanguage(savedLanguage);
     setIsPremium(savedIsPremium);
+    if (savedDownbeatAccent !== null) {
+      setDownbeatAccentEnabled(savedDownbeatAccent === 'true');
+    }
     if (savedPresets) {
       try {
         setPresets(JSON.parse(savedPresets));
@@ -577,7 +590,8 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('theme', theme);
     localStorage.setItem('language', language);
-  }, [theme, language]);
+    localStorage.setItem('downbeatAccentEnabled', String(downbeatAccentEnabled));
+  }, [theme, language, downbeatAccentEnabled]);
   
   // Save presets to localStorage
   useEffect(() => {
@@ -601,6 +615,7 @@ export default function App() {
     setTempoStep(preset.tempoStep);
     setTimePerStep(preset.timePerStep);
     setCurrentTempo(preset.startTempo);
+    setDownbeatAccentEnabled(preset.downbeatAccentEnabled ?? true); // Default to true if not set
     setActiveTab('metronome');
   };
   
@@ -623,10 +638,31 @@ export default function App() {
     setEditingPreset(undefined);
   };
   
-  const handleUnlockPremium = () => {
-    // For demo purposes, just enable premium
-    setIsPremium(true);
-    localStorage.setItem('isPremium', 'true');
+  const handleUnlockPremium = async () => {
+    try {
+      // Purchase premium via RevenueCat
+      const success = await iapService.purchasePremium();
+      
+      if (success) {
+        // Update premium features
+        const newFeatures = {
+          presets: true,
+          sounds: true,
+          adFree: true,
+        };
+        setPremiumFeatures(newFeatures);
+        savePremiumFeatures(newFeatures);
+        setIsPremium(true);
+        localStorage.setItem('isPremium', 'true');
+        
+        // Remove all ads permanently
+        await admobService.removeBanner();
+        
+        console.log('[App] Premium unlocked successfully!');
+      }
+    } catch (error) {
+      console.error('[App] Failed to purchase premium:', error);
+    }
   };
   
   const handleLeaveReview = () => {
@@ -649,25 +685,24 @@ export default function App() {
       }
     } catch (error) {
       // Fallback for older browsers or errors
-      console.warn('Could not detect platform for review link', error);
       window.open('https://play.google.com/store/apps/details?id=com.tempostep.app', '_blank');
     }
   };
   
   return (
-    <div className="h-full min-h-full overflow-hidden bg-background text-foreground flex flex-col">
-      {/* Content area */}
-      <div className="flex-1 overflow-y-auto ios-scroll">
+    <div className="h-screen bg-background text-foreground flex flex-col">
+      {/* Content area - scrollable with padding for bottom nav */}
+      <div className="flex-1 overflow-y-auto ios-scroll pb-24">
         {activeTab === 'metronome' ? (
-          <div className="flex items-center justify-center min-h-full p-4 pb-24 ios-notch-safe">
+          <div className="flex items-center justify-center min-h-full p-4 pb-20 ios-notch-safe">
             <div className="w-full max-w-md">
-              {/* Header */}
-              <header className="text-center mb-4">
+              {/* Header - with safe area padding for notch/Dynamic Island */}
+              <header className="text-center mb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
                 <h1 className="text-foreground">{translate('appName', language)}</h1>
-                <p className="text-sm text-muted-foreground mt-1">{translate('appSubtitle', language)}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{translate('appSubtitle', language)}</p>
               </header>
               
-              <div className="space-y-5">
+              <div className="space-y-3">
                 {/* Main tempo display */}
                 <div className="text-center space-y-1">
                   <div className="text-6xl tabular-nums text-foreground">
@@ -685,16 +720,17 @@ export default function App() {
                 </div>
                 
                 {/* Visual metronome indicator */}
-                <div className="py-2">
+                <div className="py-1">
                   <MetronomeArm
                     isPlaying={isPlaying}
                     bpm={actualTempo}
                     isAccent={accents[currentBeat]}
+                    isDownbeat={currentBeat === 0 && downbeatAccentEnabled}
                   />
                 </div>
                 
                 {/* Time signature selector */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-sm text-slate-600">{translate('timeSignature', language)}</label>
                     <button
@@ -714,6 +750,25 @@ export default function App() {
                   />
                 </div>
                 
+                {/* Downbeat accent toggle */}
+                <label className="flex items-center gap-3 px-1 py-2 cursor-pointer group bg-background rounded-lg">
+                  <input
+                    type="checkbox"
+                    checked={downbeatAccentEnabled}
+                    onChange={(e) => setDownbeatAccentEnabled(e.target.checked)}
+                    disabled={isPlaying}
+                    className="w-5 h-5 rounded border-2 border-border text-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-offset-0 disabled:opacity-50 cursor-pointer flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors block">
+                      {translate('downbeatAccent', language)}
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {translate('downbeatAccentDesc', language)}
+                    </p>
+                  </div>
+                </label>
+                
                 {/* Manual tempo control (only shown when progression is disabled) */}
                 {!progressionEnabled && (
                   <TempoControl
@@ -728,7 +783,7 @@ export default function App() {
                 <button
                   onClick={togglePlay}
                   className={`
-                    w-full py-4 px-6 rounded-2xl transition-all shadow-lg ios-active-feedback
+                    w-full py-3.5 px-6 rounded-2xl transition-all shadow-lg ios-active-feedback
                     flex items-center justify-center gap-3
                     ${
                       isPlaying
@@ -786,6 +841,7 @@ export default function App() {
               denominator,
               accents,
               subdivision,
+              downbeatAccentEnabled,
             }}
             language={language}
             onSave={handleSavePreset}
@@ -808,60 +864,60 @@ export default function App() {
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg ios-bottom-nav z-50">
-        <div className="max-w-md mx-auto px-4 py-2 flex">
+      {/* Bottom Navigation - Compact version */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))]">
+        <div className="max-w-md mx-auto bg-card border border-border rounded-2xl shadow-lg px-1.5 py-1 flex">
           <button
             onClick={() => setActiveTab('metronome')}
             className={`
-              flex-1 py-3 px-4 rounded-lg transition-all flex flex-col items-center gap-1 ios-active-feedback
+              flex-1 py-1 px-1.5 rounded-lg transition-all flex flex-col items-center gap-0.5 ios-active-feedback
               ${
                 activeTab === 'metronome'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'text-blue-600'
+                  : 'text-muted-foreground'
               }
             `}
           >
             <Music className="w-5 h-5" />
-            <span className="text-xs">{translate('metronome', language)}</span>
+            <span className="text-[10px] font-medium">{translate('metronome', language)}</span>
           </button>
           
           <button
             onClick={() => setActiveTab('tuner')}
             className={`
-              flex-1 py-3 px-4 rounded-lg transition-all flex flex-col items-center gap-1 ios-active-feedback
+              flex-1 py-1 px-1.5 rounded-lg transition-all flex flex-col items-center gap-0.5 ios-active-feedback
               ${
                 activeTab === 'tuner'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'text-blue-600'
+                  : 'text-muted-foreground'
               }
             `}
           >
             <Radio className="w-5 h-5" />
-            <span className="text-xs">{translate('tuner', language)}</span>
+            <span className="text-[10px] font-medium">{translate('tuner', language)}</span>
           </button>
           
           <button
             onClick={() => setActiveTab('presets')}
             className={`
-              flex-1 py-3 px-4 rounded-lg transition-all flex flex-col items-center gap-1 ios-active-feedback
+              flex-1 py-1 px-1.5 rounded-lg transition-all flex flex-col items-center gap-0.5 ios-active-feedback
               ${
                 activeTab === 'presets'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'text-blue-600'
+                  : 'text-muted-foreground'
               }
             `}
           >
             <Bookmark className="w-5 h-5" />
-            <span className="text-xs">{translate('presets', language)}</span>
+            <span className="text-[10px] font-medium">{translate('presets', language)}</span>
           </button>
           
           <button
             onClick={() => setAppSettingsOpen(true)}
-            className="flex-1 py-3 px-4 rounded-lg transition-all flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground hover:bg-accent ios-active-feedback"
+            className="flex-1 py-1 px-1.5 rounded-lg transition-all flex flex-col items-center gap-0.5 text-muted-foreground ios-active-feedback"
           >
             <Settings className="w-5 h-5" />
-            <span className="text-xs">{translate('settings', language)}</span>
+            <span className="text-[10px] font-medium">{translate('settings', language)}</span>
           </button>
         </div>
       </nav>
@@ -882,6 +938,7 @@ export default function App() {
         onSoundTypeChange={setSoundType}
         isPremiumSounds={premiumFeatures.sounds}
         onUpgradeSounds={() => setPremiumModalOpen(true)}
+        downbeatAccentEnabled={downbeatAccentEnabled}
       />
       
       {/* App Settings Modal */}

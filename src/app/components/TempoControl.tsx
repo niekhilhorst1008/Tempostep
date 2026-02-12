@@ -52,13 +52,13 @@ export function TempoControl({
   }, []);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-baseline">
-        <label className="text-sm text-slate-600">{label}</label>
-        <span className="text-lg text-slate-900">{value} BPM</span>
+        <label className="text-xs text-slate-600">{label}</label>
+        <span className="text-sm text-slate-900">{value} BPM</span>
       </div>
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
           onClick={() => onChange(Math.max(min, value - 1))}
           onMouseDown={() => handleMouseDown(-1)}
@@ -67,7 +67,7 @@ export function TempoControl({
           onTouchStart={() => handleMouseDown(-1)}
           onTouchEnd={handleMouseUp}
           disabled={disabled || value <= min}
-          className="w-12 h-12 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors flex items-center justify-center text-slate-700 text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors flex items-center justify-center text-slate-700 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           −
         </button>
@@ -90,7 +90,7 @@ export function TempoControl({
           onTouchStart={() => handleMouseDown(1)}
           onTouchEnd={handleMouseUp}
           disabled={disabled || value >= max}
-          className="w-12 h-12 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors flex items-center justify-center text-slate-700 text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 transition-colors flex items-center justify-center text-slate-700 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           +
         </button>

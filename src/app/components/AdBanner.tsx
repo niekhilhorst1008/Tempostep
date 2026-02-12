@@ -16,16 +16,16 @@ export function AdBanner({ language, onUpgrade }: AdBannerProps) {
   useEffect(() => {
     // Initialize and show AdMob banner when component mounts
     if (isNativeApp()) {
-      admobService.showBanner().catch((error) => {
-        console.warn('AdMob banner display skipped:', error);
+      admobService.showBanner().catch(() => {
+        // Banner display skipped
       });
     }
 
     // Cleanup: remove banner when component unmounts
     return () => {
       if (isNativeApp()) {
-        admobService.removeBanner().catch((error) => {
-          console.warn('AdMob banner removal skipped:', error);
+        admobService.removeBanner().catch(() => {
+          // Banner removal skipped
         });
       }
     };
@@ -42,7 +42,7 @@ export function AdBanner({ language, onUpgrade }: AdBannerProps) {
 
   // PWA placeholder ad
   return (
-    <div className="bg-gradient-to-r from-slate-100 to-slate-200 border-t border-slate-300 py-3 px-4">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-slate-100 to-slate-200 border-t border-slate-300 py-3 px-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
       <div className="max-w-md mx-auto flex items-center justify-between gap-3">
         <div className="flex-1">
           <p className="text-xs text-slate-700 mb-1">

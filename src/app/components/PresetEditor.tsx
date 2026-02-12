@@ -20,6 +20,7 @@ interface PresetEditorProps {
     denominator: number;
     accents: boolean[];
     subdivision: number;
+    downbeatAccentEnabled?: boolean;
   };
   language: Language;
   onSave: (name: string, settings: typeof currentSettings) => void;
@@ -66,7 +67,7 @@ export function PresetEditor({
     <div className="min-h-screen bg-background pb-24">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-background border-b border-border px-4 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-background border-b border-border px-4 py-4 pt-[calc(1rem+env(safe-area-inset-top))] flex items-center justify-between z-10">
           <button
             onClick={onCancel}
             className="p-2 hover:bg-accent rounded-lg transition-colors"
@@ -227,6 +228,24 @@ export function PresetEditor({
                 onNumeratorChange={(value) => updateSetting("numerator", value)}
                 onDenominatorChange={(value) => updateSetting("denominator", value)}
               />
+              
+              {/* Downbeat accent toggle */}
+              <label className="flex items-center gap-2.5 mt-2 px-1 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={settings.downbeatAccentEnabled ?? true}
+                  onChange={(e) => updateSetting("downbeatAccentEnabled", e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer"
+                />
+                <div className="flex-1">
+                  <span className="text-sm text-slate-700 group-hover:text-slate-900 transition-colors">
+                    {translate('downbeatAccent', language)}
+                  </span>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {translate('downbeatAccentDesc', language)}
+                  </p>
+                </div>
+              </label>
             </div>
 
             {/* Accent pattern */}
@@ -238,6 +257,7 @@ export function PresetEditor({
                 beatsPerBar={settings.numerator}
                 accents={settings.accents}
                 onAccentToggle={toggleAccent}
+                downbeatAccentEnabled={settings.downbeatAccentEnabled ?? true}
               />
             </div>
 

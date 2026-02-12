@@ -11,6 +11,20 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    // Ignore figma:asset imports (placeholder plugin)
+    {
+      name: 'ignore-figma-assets',
+      resolveId(id) {
+        if (id.startsWith('figma:asset/')) {
+          return id;
+        }
+      },
+      load(id) {
+        if (id.startsWith('figma:asset/')) {
+          return 'export default ""';
+        }
+      }
+    }
   ],
   resolve: {
     alias: {

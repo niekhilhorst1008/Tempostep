@@ -6,6 +6,7 @@ interface AccentPatternProps {
   onAccentToggle: (index: number) => void;
   disabled?: boolean;
   currentBeat?: number;
+  downbeatAccentEnabled?: boolean;
 }
 
 export function AccentPattern({
@@ -14,11 +15,13 @@ export function AccentPattern({
   onAccentToggle,
   disabled = false,
   currentBeat,
+  downbeatAccentEnabled = false,
 }: AccentPatternProps) {
   return (
     <div className="flex gap-3 justify-center flex-wrap">
       {Array.from({ length: beatsPerBar }).map((_, index) => {
         const isAccented = accents[index];
+        const isDownbeat = index === 0 && downbeatAccentEnabled;
         const isCurrentBeat = currentBeat === index;
         
         return (
@@ -32,7 +35,9 @@ export function AccentPattern({
               className={`
                 w-12 h-12 rounded-full border-2 transition-all
                 ${
-                  isAccented
+                  isDownbeat
+                    ? "bg-gradient-to-br from-amber-400 to-orange-500 border-orange-600 shadow-md"
+                    : isAccented
                     ? "bg-blue-500 border-blue-600"
                     : "bg-white border-slate-300"
                 }
@@ -50,8 +55,8 @@ export function AccentPattern({
               {/* Beat number */}
               <span
                 className={`
-                  absolute inset-0 flex items-center justify-center text-sm
-                  ${isAccented ? "text-white" : "text-slate-600"}
+                  absolute inset-0 flex items-center justify-center text-sm font-semibold
+                  ${isDownbeat || isAccented ? "text-white" : "text-slate-600"}
                 `}
               >
                 {index + 1}

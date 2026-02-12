@@ -1,7 +1,0 @@
-{
-  "name": "TempoStep",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "react"
-}

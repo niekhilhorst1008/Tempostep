@@ -13,7 +13,7 @@ export function TimeSignatureSelector({
   onDenominatorChange,
   disabled = false,
 }: TimeSignatureSelectorProps) {
-  const numeratorOptions = Array.from({ length: 18 }, (_, i) => i + 1);
+  const numeratorOptions = Array.from({ length: 32 }, (_, i) => i + 1);
   const denominatorOptions = [1, 2, 4, 8, 16, 32];
 
   return (

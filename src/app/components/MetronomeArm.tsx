@@ -5,9 +5,10 @@ interface MetronomeArmProps {
   isPlaying: boolean;
   bpm: number;
   isAccent: boolean;
+  isDownbeat?: boolean;
 }
 
-export function MetronomeArm({ isPlaying, bpm, isAccent }: MetronomeArmProps) {
+export function MetronomeArm({ isPlaying, bpm, isAccent, isDownbeat = false }: MetronomeArmProps) {
   const [beat, setBeat] = useState(0);
   
   // Calculate animation duration based on BPM
@@ -60,15 +61,15 @@ export function MetronomeArm({ isPlaying, bpm, isAccent }: MetronomeArmProps) {
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8"
         initial={{ scale: 1, opacity: 0 }}
         animate={{
-          scale: [1, 2.5],
-          opacity: [0, isAccent ? 0.4 : 0.2, 0],
+          scale: [1, isDownbeat ? 3 : 2.5],
+          opacity: [0, isDownbeat ? 0.5 : (isAccent ? 0.4 : 0.2), 0],
         }}
         transition={{ duration: duration * 0.5 }}
       >
         <div 
           className="w-full h-full rounded-full"
           style={{
-            border: `2px solid ${isAccent ? "#3b82f6" : "#94a3b8"}`,
+            border: `2px solid ${isDownbeat ? "#f59e0b" : (isAccent ? "#3b82f6" : "#94a3b8")}`,
           }}
         />
       </motion.div>

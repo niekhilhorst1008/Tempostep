@@ -39,17 +39,17 @@ export function ProgressionSettings({
   language,
 }: ProgressionSettingsProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 space-y-6 shadow-sm border border-slate-200">
-      <h3 className="text-slate-900">{translate('progression', language)}</h3>
+    <div className="bg-white rounded-2xl p-4 space-y-3 shadow-sm border border-slate-200">
+      <h3 className="text-slate-900 text-base">{translate('progression', language)}</h3>
       
-      <div className="space-y-2">
-        <label className="text-sm text-slate-600">{translate('progressionEnabled', language)}</label>
+      <div className="space-y-1.5">
+        <label className="text-xs text-slate-600">{translate('progressionEnabled', language)}</label>
         <div className="flex gap-2">
           <button
             onClick={() => onEnabledChange(true)}
             disabled={disabled}
             className={`
-              flex-1 py-2 px-3 rounded-lg transition-all text-sm
+              flex-1 py-1.5 px-3 rounded-lg transition-all text-xs
               ${
                 enabled
                   ? "bg-blue-500 text-white shadow-sm"
@@ -64,7 +64,7 @@ export function ProgressionSettings({
             onClick={() => onEnabledChange(false)}
             disabled={disabled}
             className={`
-              flex-1 py-2 px-3 rounded-lg transition-all text-sm
+              flex-1 py-1.5 px-3 rounded-lg transition-all text-xs
               ${
                 !enabled
                   ? "bg-blue-500 text-white shadow-sm"
@@ -96,19 +96,19 @@ export function ProgressionSettings({
         />
       </div>
       
-      <div className={`space-y-2 ${enabled ? "" : "opacity-40 pointer-events-none"}`}>
+      <div className={`space-y-1.5 ${enabled ? "" : "opacity-40 pointer-events-none"}`}>
         <div className="flex justify-between items-baseline">
-          <label className="text-sm text-slate-600">{translate('increment', language)}</label>
-          <span className="text-lg text-slate-900">+{tempoStep} {translate('bpm', language)}</span>
+          <label className="text-xs text-slate-600">{translate('increment', language)}</label>
+          <span className="text-sm text-slate-900">+{tempoStep} {translate('bpm', language)}</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {[1, 2, 5, 10].map((step) => (
             <button
               key={step}
               onClick={() => onTempoStepChange(step)}
               disabled={disabled || !enabled}
               className={`
-                flex-1 py-2 px-3 rounded-lg transition-all text-sm
+                flex-1 py-1.5 px-2 rounded-lg transition-all text-xs
                 ${
                   tempoStep === step
                     ? "bg-blue-500 text-white shadow-sm"
@@ -123,16 +123,16 @@ export function ProgressionSettings({
         </div>
       </div>
       
-      <div className={`space-y-2 ${enabled ? "" : "opacity-40 pointer-events-none"}`}>
-        <label className="text-sm text-slate-600">{translate('interval', language)}</label>
-        <div className="flex gap-2">
+      <div className={`space-y-1.5 ${enabled ? "" : "opacity-40 pointer-events-none"}`}>
+        <label className="text-xs text-slate-600">{translate('interval', language)}</label>
+        <div className="flex gap-1.5">
           {TIME_OPTIONS.map((option) => (
             <button
               key={option.value}
               onClick={() => onTimePerStepChange(option.value)}
               disabled={disabled || !enabled}
               className={`
-                flex-1 py-2 px-3 rounded-lg transition-all text-sm
+                flex-1 py-1.5 px-2 rounded-lg transition-all text-xs
                 ${
                   timePerStep === option.value
                     ? "bg-blue-500 text-white shadow-sm"

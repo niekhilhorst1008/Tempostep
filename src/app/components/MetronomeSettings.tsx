@@ -21,6 +21,7 @@ interface MetronomeSettingsProps {
   onSoundTypeChange: (sound: SoundType) => void;
   isPremiumSounds: boolean;
   onUpgradeSounds: () => void;
+  downbeatAccentEnabled: boolean;
 }
 
 export function MetronomeSettings({
@@ -38,6 +39,7 @@ export function MetronomeSettings({
   onSoundTypeChange,
   isPremiumSounds,
   onUpgradeSounds,
+  downbeatAccentEnabled,
 }: MetronomeSettingsProps) {
   if (!isOpen) return null;
 
@@ -77,6 +79,7 @@ export function MetronomeSettings({
               onAccentToggle={onAccentToggle}
               disabled={disabled}
               currentBeat={currentBeat}
+              downbeatAccentEnabled={downbeatAccentEnabled}
             />
           </div>
 

@@ -25,7 +25,7 @@ export function PresetsList({
   // If not premium, show premium gate
   if (!isPremium) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4 bg-background">
+      <div className="flex items-center justify-center min-h-screen p-4 bg-background pt-[calc(1rem+env(safe-area-inset-top))]">
         <div className="w-full max-w-md">
           {/* Header */}
           <header className="text-center mb-8">
@@ -98,10 +98,10 @@ export function PresetsList({
 
   // Premium user - show presets
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="max-w-md mx-auto p-4">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-md mx-auto p-4 pt-[calc(1rem+env(safe-area-inset-top))]">
         {/* Header */}
-        <header className="text-center mb-8 pt-4">
+        <header className="text-center mb-6 pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 rounded-full mb-3">
             <Crown className="w-4 h-4 text-amber-600" />
             <span className="text-xs font-semibold text-amber-900">

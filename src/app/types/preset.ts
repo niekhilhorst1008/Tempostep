@@ -10,6 +10,7 @@ export interface Preset {
   denominator: number;
   accents: boolean[];
   subdivision: number;
+  downbeatAccentEnabled?: boolean; // Optional for backward compatibility
   createdAt: number;
 }
 

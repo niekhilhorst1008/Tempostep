@@ -62,7 +62,6 @@ class IAPService {
       this.PurchasesModule = module.Purchases;
       return module;
     } catch (error) {
-      console.warn('RevenueCat module not available in this environment');
       return null;
     }
   }
@@ -73,46 +72,52 @@ class IAPService {
    */
   async initialize(userId?: string): Promise<void> {
     if (!this.isNativeApp) {
-      console.log('IAP: Running in PWA mode, purchases disabled');
       this.isInitialized = true;
       return;
     }
 
     if (this.isInitialized) {
-      console.log('IAP: Already initialized');
       return;
     }
 
     if (REVENUECAT_API_KEY === 'YOUR_REVENUECAT_IOS_API_KEY_HERE') {
-      console.warn('⚠️ IAP: RevenueCat API key not configured! Purchases will not work.');
-      console.warn('Get your API key from: https://app.revenuecat.com/settings/api-keys');
       return;
     }
 
     try {
-      const module = await this.loadPurchasesModule();
-      if (!module) return;
+      // Add 5 second timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('RevenueCat initialization timeout')), 5000)
+      );
+      
+      const initPromise = (async () => {
+        const module = await this.loadPurchasesModule();
+        if (!module) throw new Error('Module load failed');
 
-      const { Purchases, LOG_LEVEL } = module;
+        const { Purchases, LOG_LEVEL } = module;
 
-      // Configure RevenueCat
-      await Purchases.configure({
-        apiKey: REVENUECAT_API_KEY,
-        appUserID: userId, // Optional: Set user ID for tracking
-      });
+        // Configure RevenueCat
+        await Purchases.configure({
+          apiKey: REVENUECAT_API_KEY,
+          appUserID: userId, // Optional: Set user ID for tracking
+        });
 
-      // Enable debug logs in development
-      if (import.meta.env.DEV) {
-        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
-      }
+        // Enable debug logs in development
+        if (import.meta.env.DEV) {
+          await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+        }
 
-      this.isInitialized = true;
-      console.log('IAP: RevenueCat initialized successfully');
+        this.isInitialized = true;
 
-      // Load available products
-      await this.loadProducts();
+        // Load available products
+        await this.loadProducts();
+      })();
+      
+      // Race between initialization and timeout
+      await Promise.race([initPromise, timeoutPromise]);
     } catch (error) {
       console.error('IAP: Initialization failed', error);
+      this.isInitialized = true; // Mark as initialized to prevent retries
     }
   }
 
@@ -125,11 +130,17 @@ class IAPService {
     }
 
     try {
-      const module = await this.loadPurchasesModule();
-      if (!module) return [];
+      // Add timeout
+      const timeoutPromise = new Promise<IAPProduct[]>((_, reject) => 
+        setTimeout(() => reject(new Error('Load products timeout')), 5000)
+      );
+      
+      const loadPromise = (async () => {
+        const module = await this.loadPurchasesModule();
+        if (!module) return [];
 
-      const { Purchases } = module;
-      const offerings = await Purchases.getOfferings();
+        const { Purchases } = module;
+        const offerings = await Purchases.getOfferings();
       
       if (offerings.current) {
         this.currentOffering = offerings.current;
@@ -142,12 +153,14 @@ class IAPService {
           priceString: pkg.product.priceString,
         }));
 
-        console.log('IAP: Products loaded:', products);
         return products;
       }
 
-      console.log('IAP: No offerings available');
       return [];
+      })();
+      
+      // Race with timeout
+      return await Promise.race([loadPromise, timeoutPromise]);
     } catch (error) {
       console.error('IAP: Failed to load products', error);
       return [];
@@ -161,7 +174,6 @@ class IAPService {
    */
   async purchaseProduct(productId: string): Promise<boolean> {
     if (!this.isNativeApp) {
-      console.log('IAP: Purchase simulated in PWA mode');
       // Simulate purchase delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       return true;
@@ -199,16 +211,13 @@ class IAPService {
       const hasEntitlement = Object.keys(purchaseResult.customerInfo.entitlements.active).length > 0;
 
       if (hasEntitlement) {
-        console.log('IAP: Purchase successful!', purchaseResult);
         return true;
       }
 
-      console.log('IAP: Purchase completed but no entitlements granted');
       return false;
     } catch (error: any) {
       // User cancelled the purchase
       if (error.code === '1') {
-        console.log('IAP: User cancelled purchase');
         return false;
       }
 
@@ -223,7 +232,6 @@ class IAPService {
    */
   async restorePurchases(): Promise<boolean> {
     if (!this.isNativeApp) {
-      console.log('IAP: Restore simulated in PWA mode');
       return true;
     }
 
@@ -242,11 +250,9 @@ class IAPService {
       const hasActiveEntitlements = Object.keys(customerInfo.customerInfo.entitlements.active).length > 0;
       
       if (hasActiveEntitlements) {
-        console.log('IAP: Purchases restored successfully');
         return true;
       }
 
-      console.log('IAP: No purchases to restore');
       return false;
     } catch (error) {
       console.error('IAP: Restore failed', error);

@@ -88,7 +88,9 @@ type TranslationKey =
   | 'purchaseError'
   | 'restoreSuccess'
   | 'restoreNoPurchases'
-  | 'restoreError';
+  | 'restoreError'
+  | 'downbeatAccent'
+  | 'downbeatAccentDesc';
 
 type Translations = {
   [key in Language]: {
@@ -186,6 +188,8 @@ const translations: Translations = {
     restoreSuccess: 'Purchases restored successfully!',
     restoreNoPurchases: 'No previous purchases found',
     restoreError: 'Failed to restore purchases. Please try again.',
+    downbeatAccent: 'Downbeat Accent',
+    downbeatAccentDesc: 'Emphasize first beat of each measure',
   },
   es: {
     appName: 'TempoStep',
@@ -266,6 +270,18 @@ const translations: Translations = {
     premiumFooter: 'Actualiza a Premium',
     adBannerText: 'Los anuncios nos ayudan a mantener la aplicación gratuita. Actualiza a Premium para eliminar anuncios.',
     removeAds: 'Eliminar Anuncios',
+    unlockPremiumNow: 'Desbloquear Premium Ahora',
+    restorePurchases: 'Restaurar Compras',
+    processing: 'Procesando...',
+    restoring: 'Restaurando...',
+    purchaseSuccess: '¡Premium desbloqueado! Disfruta de todas las funciones.',
+    purchaseCancelled: 'Compra cancelada',
+    purchaseError: 'Error en la compra. Inténtalo de nuevo.',
+    restoreSuccess: '¡Compras restauradas con éxito!',
+    restoreNoPurchases: 'No se encontraron compras anteriores',
+    restoreError: 'Error al restaurar compras. Inténtalo de nuevo.',
+    downbeatAccent: 'Acento en Tiempo Fuerte',
+    downbeatAccentDesc: 'Enfatizar el primer tiempo de cada compás',
   },
   fr: {
     appName: 'TempoStep',
@@ -346,6 +362,18 @@ const translations: Translations = {
     premiumFooter: 'Passez à Premium',
     adBannerText: 'Les publicités nous aident à maintenir l\'application gratuite. Passez à Premium pour supprimer les publicités.',
     removeAds: 'Supprimer les Publicités',
+    unlockPremiumNow: 'Débloquer Premium Maintenant',
+    restorePurchases: 'Restaurer les Achats',
+    processing: 'Traitement...',
+    restoring: 'Restauration...',
+    purchaseSuccess: 'Premium débloqué ! Profitez de toutes les fonctionnalités.',
+    purchaseCancelled: 'Achat annulé',
+    purchaseError: 'Échec de l\'achat. Veuillez réessayer.',
+    restoreSuccess: 'Achats restaurés avec succès !',
+    restoreNoPurchases: 'Aucun achat précédent trouvé',
+    restoreError: 'Échec de la restauration des achats. Veuillez réessayer.',
+    downbeatAccent: 'Accent sur le Temps Fort',
+    downbeatAccentDesc: 'Accentuer le premier temps de chaque mesure',
   },
   de: {
     appName: 'TempoStep',
@@ -426,6 +454,18 @@ const translations: Translations = {
     premiumFooter: 'Upgrade auf Premium',
     adBannerText: 'Werbung hilft uns, die App kostenlos zu halten. Upgrade auf Premium, um Werbung zu entfernen.',
     removeAds: 'Werbung entfernen',
+    unlockPremiumNow: 'Premium jetzt entsperren',
+    restorePurchases: 'Käufe wiederherstellen',
+    processing: 'Verarbeitung...',
+    restoring: 'Wiederherstellung...',
+    purchaseSuccess: 'Premium freigeschaltet! Genießen Sie alle Funktionen.',
+    purchaseCancelled: 'Kauf abgebrochen',
+    purchaseError: 'Kauf fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    restoreSuccess: 'Käufe erfolgreich wiederhergestellt!',
+    restoreNoPurchases: 'Keine früheren Käufe gefunden',
+    restoreError: 'Wiederherstellung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    downbeatAccent: 'Taktschlag-Akzent',
+    downbeatAccentDesc: 'Ersten Schlag jedes Taktes betonen',
   },
   it: {
     appName: 'TempoStep',
@@ -506,6 +546,18 @@ const translations: Translations = {
     premiumFooter: 'Aggiorna a Premium',
     adBannerText: 'Le pubblicità ci aiutano a mantenere l\'app gratuita. Aggiorna a Premium per rimuovere le pubblicità.',
     removeAds: 'Rimuovi Pubblicità',
+    unlockPremiumNow: 'Sblocca Premium Ora',
+    restorePurchases: 'Ripristina Acquisti',
+    processing: 'Elaborazione...',
+    restoring: 'Ripristino...',
+    purchaseSuccess: 'Premium sbloccato! Goditi tutte le funzionalità.',
+    purchaseCancelled: 'Acquisto annullato',
+    purchaseError: 'Acquisto fallito. Riprova.',
+    restoreSuccess: 'Acquisti ripristinati con successo!',
+    restoreNoPurchases: 'Nessun acquisto precedente trovato',
+    restoreError: 'Ripristino fallito. Riprova.',
+    downbeatAccent: 'Accento sul Battere',
+    downbeatAccentDesc: 'Enfatizza il primo battito di ogni misura',
   },
   nl: {
     appName: 'TempoStep',
@@ -596,6 +648,8 @@ const translations: Translations = {
     restoreSuccess: 'Aankopen succesvol hersteld!',
     restoreNoPurchases: 'Geen eerdere aankopen gevonden',
     restoreError: 'Kan aankopen niet herstellen. Probeer het opnieuw.',
+    downbeatAccent: 'Eerste Maatslag Accent',
+    downbeatAccentDesc: 'Benadruk de eerste tel van elke maat',
   },
 };
 

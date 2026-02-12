@@ -169,26 +169,31 @@
     -webkit-text-size-adjust: 100%;
     /* Prevent rubber band scrolling */
     overscroll-behavior-y: none;
+    /* CRITICAL iOS FIX: Fill entire viewport including safe areas */
+    height: 100%;
+    width: 100%;
   }
 
   body {
     @apply bg-background text-foreground;
-    /* iOS Safe Area support - DO NOT use padding, let safe-area-inset-* work naturally */
-    /* Prevent overscroll */
+    /* Prevent overscroll bounce */
     overscroll-behavior-y: none;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
     overflow: hidden;
     /* Smooth scrolling for iOS */
     -webkit-overflow-scrolling: touch;
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   #root {
     width: 100%;
     height: 100%;
-    overflow: hidden;
     background-color: var(--background);
+    overflow: hidden;
   }
 
   /* iOS Input zoom prevention */

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Mic, MicOff, Settings } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 
 interface TunerProps {
   referencePitch: number;
@@ -59,21 +60,21 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
 
   // Autocorrelation pitch detection
   const autoCorrelate = (buffer: Float32Array, sampleRate: number): number => {
-    // Minimum correlation value to accept
-    const MIN_CORRELATION = 0.9;
+    // Minimum correlation value to accept - HIGHER for less sensitivity
+    const MIN_CORRELATION = 0.95;
     let size = buffer.length;
     let maxSamples = Math.floor(size / 2);
     let best_offset = -1;
     let best_correlation = 0;
     let foundGoodCorrelation = false;
 
-    // Check for sufficient signal
+    // Check for sufficient signal - HIGHER threshold for less sensitivity
     let rms = 0;
     for (let i = 0; i < size; i++) {
       rms += buffer[i] * buffer[i];
     }
     rms = Math.sqrt(rms / size);
-    if (rms < 0.01) return -1; // Signal too weak
+    if (rms < 0.03) return -1; // Signal too weak - increased from 0.01
 
     // Find the best correlation offset
     let lastCorrelation = 1;
@@ -123,8 +124,8 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
       // Add to frequency buffer for smoothing
       frequencyBufferRef.current.push(frequency);
       
-      // Keep only last 8 readings (about 0.13 seconds at 60fps)
-      if (frequencyBufferRef.current.length > 8) {
+      // Keep only last 15 readings (more smoothing for less sensitivity)
+      if (frequencyBufferRef.current.length > 15) {
         frequencyBufferRef.current.shift();
       }
       
@@ -152,20 +153,6 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
     try {
       setPermissionError(false); // Reset error state
       
-      // For Capacitor apps, check permission status first
-      if (navigator.permissions && navigator.permissions.query) {
-        try {
-          const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-          if (permissionStatus.state === 'denied') {
-            setPermissionError(true);
-            return;
-          }
-        } catch (e) {
-          // Permission API might not be available, continue anyway
-          console.log('Permission query not supported, trying getUserMedia directly');
-        }
-      }
-      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: false,
@@ -189,7 +176,6 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
       setIsListening(true);
       updatePitch();
     } catch (error) {
-      console.error("Error accessing microphone:", error);
       setPermissionError(true);
     }
   };
@@ -240,8 +226,8 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
   const inTune = Math.abs(centsOff) <= 5;
 
   return (
-    <div className="min-h-screen bg-background p-6 pb-24">
-      <div className="max-w-md mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-4 pb-20 pt-[calc(1rem+env(safe-area-inset-top))]">
+      <div className="max-w-md mx-auto space-y-6">
         {/* Settings button */}
         <div className="flex justify-end">
           <button
@@ -616,19 +602,37 @@ export function Tuner({ referencePitch, onReferencePitchChange }: TunerProps) {
 
         {/* Permission error message */}
         {permissionError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-800">
-            <p className="font-semibold mb-2">🎤 Microphone Access Denied</p>
-            <p className="mb-3">
-              The tuner needs microphone access to detect pitch. Please grant permission in your browser settings:
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-5 text-sm text-red-900">
+            <p className="font-bold mb-3 text-base">🎤 Microphone Access Denied</p>
+            <p className="mb-4 font-medium">
+              The tuner needs microphone access to detect pitch. Please grant permission in your {Capacitor.isNativePlatform() ? 'device' : 'browser'} settings:
             </p>
-            <ul className="list-disc list-inside space-y-1 mb-3 text-xs">
-              <li>Click the lock icon in your browser's address bar</li>
-              <li>Allow microphone access for this site</li>
-              <li>Reload the page if needed</li>
+            <ul className="list-disc list-inside space-y-2 mb-4 text-sm">
+              {Capacitor.getPlatform() === 'ios' ? (
+                <>
+                  <li>Open <strong>Settings</strong> on your iPhone</li>
+                  <li>Scroll down and tap <strong>TempoStep</strong></li>
+                  <li>Enable <strong>Microphone</strong> access</li>
+                  <li>Return to the app and try again</li>
+                </>
+              ) : Capacitor.getPlatform() === 'android' ? (
+                <>
+                  <li>Open <strong>Settings</strong> on your device</li>
+                  <li>Go to <strong>Apps</strong> → <strong>TempoStep</strong></li>
+                  <li>Tap <strong>Permissions</strong></li>
+                  <li>Allow <strong>Microphone</strong> access</li>
+                </>
+              ) : (
+                <>
+                  <li>Click the <strong>lock icon</strong> in your browser's address bar</li>
+                  <li>Allow <strong>microphone access</strong> for this site</li>
+                  <li>Reload the page if needed</li>
+                </>
+              )}
             </ul>
             <button
               onClick={startListening}
-              className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors shadow-md"
             >
               Try Again
             </button>

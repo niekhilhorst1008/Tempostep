@@ -20,7 +20,6 @@ export function InstallPrompt({ language = 'en' }: InstallPromptProps) {
     const handler = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      console.log('beforeinstallprompt event fired!');
       // Stash the event so it can be triggered later
       setDeferredPrompt(e);
       // Show our custom install prompt
@@ -46,8 +45,6 @@ export function InstallPrompt({ language = 'en' }: InstallPromptProps) {
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-
-    console.log(`User response to install prompt: ${outcome}`);
 
     // Clear the deferred prompt
     setDeferredPrompt(null);

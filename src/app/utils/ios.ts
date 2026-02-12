@@ -78,7 +78,6 @@ export const requestPersistentStorage = async (): Promise<boolean> => {
   try {
     if (navigator.storage && navigator.storage.persist) {
       const isPersisted = await navigator.storage.persist();
-      console.log('Persistent storage:', isPersisted);
       return isPersisted;
     }
   } catch (error) {
@@ -105,10 +104,22 @@ export const initAudioContextIOS = async (audioContext: AudioContext): Promise<v
     source.buffer = silentBuffer;
     source.connect(audioContext.destination);
     source.start(0);
-
-    console.log('iOS Audio Context initialized successfully');
+    
+    // Also play a very short audible beep to REALLY unlock iOS audio
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 1000;
+    gainNode.gain.value = 0.1; // Quiet but audible
+    
+    const now = audioContext.currentTime;
+    oscillator.start(now);
+    oscillator.stop(now + 0.05); // Very short 50ms beep
   } catch (error) {
-    console.error('Error initializing iOS Audio Context:', error);
+    console.error('❌ Error initializing iOS Audio Context:', error);
   }
 };
 
